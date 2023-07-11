@@ -3,7 +3,16 @@ import re
 from dataclasses import dataclass
 from functools import cached_property
 
-
+WINNING_PATTERNS = (
+    "???......",
+    "...???...",
+    "......???",
+    "?..?..?..",
+    ".?..?..?.",
+    "..?..?..?",
+    "?...?...?",
+    "..?.?.?..",
+)
 # Two singleton instances of the Mark class
 class Mark(enum.StrEnum):
     CROSS = "X"
@@ -64,4 +73,19 @@ class GameState:
     def tie(self) -> bool:
         return self.grid.empty_count==0 and self.winner is None
 
+    @cached_property
+    def winner(self) -> Mark | None:
+        for pattern in WINNING_PATTERNS:
+            for mark in Mark:
+                if re.match(pattern.replace("?",mark), self.grid.cells):
+                    return mark
+        return None
 
+    @cached_property
+    def winning_cells(self) -> list[int]:
+        for pattern in WINNING_PATTERNS:
+            for mark in Mark:
+                if re.match(pattern.replace("?", mark), self.grid.cells):
+                    return [match.start() for match in re.finditer(r"\?", pattern)]
+
+        return []
