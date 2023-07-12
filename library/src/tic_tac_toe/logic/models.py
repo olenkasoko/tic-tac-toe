@@ -2,6 +2,7 @@ import enum
 import re
 from dataclasses import dataclass
 from functools import cached_property
+from tic_tac_toe.logic.validators import validate_grid
 
 WINNING_PATTERNS = (
     "???......",
@@ -30,6 +31,7 @@ class Grid:
     def __post_init__(self) -> None:
         if not re.match(r"^[\sXO]{9}$", self.cells):
             raise ValueError("Must contain 9 cells of: X, O, or space")
+        validate_grid(self)
 
     @cached_property
     def x_count(self) -> int:
